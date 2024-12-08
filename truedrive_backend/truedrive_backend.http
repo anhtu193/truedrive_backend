@@ -1,0 +1,6 @@
+@truedrive_backend_HostAddress = http://localhost:5210
+
+GET {{truedrive_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
