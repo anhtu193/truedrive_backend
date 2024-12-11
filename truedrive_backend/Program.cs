@@ -12,6 +12,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TrueDriveContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TrueDriveContext")));
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,19 +30,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-    using (var scope = app.Services.CreateScope())
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<TrueDriveContext>();
+    try
     {
-        var context = scope.ServiceProvider.GetRequiredService<TrueDriveContext>();
-        try
-        {
-            context.Database.CanConnect();
-            Console.WriteLine("Database connection successful.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Database connection failed: {ex.Message}");
-        }
+        context.Database.CanConnect();
+        Console.WriteLine("Database connection successful.");
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database connection failed: {ex.Message}");
+    }
+}
+
+// Use CORS policy
+app.UseCors("AllowSpecificOrigin");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
