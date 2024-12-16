@@ -18,9 +18,16 @@ namespace truedrive_backend.Controllers
 
         // GET: api/Car
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Car>>> GetCars()
+        public async Task<ActionResult<IEnumerable<Car>>> GetCars([FromQuery] int? limit)
         {
-            return await _context.Car.ToListAsync();
+            var query = _context.Car.AsQueryable();
+
+            if (limit.HasValue)
+            {
+                query = query.Take(limit.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         // GET: api/Car/5

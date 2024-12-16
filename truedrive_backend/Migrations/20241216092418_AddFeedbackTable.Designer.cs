@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using truedrive_backend.Data;
 
@@ -11,9 +12,11 @@ using truedrive_backend.Data;
 namespace truedrive_backend.Migrations
 {
     [DbContext(typeof(TrueDriveContext))]
-    partial class TrueDriveContextModelSnapshot : ModelSnapshot
+    [Migration("20241216092418_AddFeedbackTable")]
+    partial class AddFeedbackTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

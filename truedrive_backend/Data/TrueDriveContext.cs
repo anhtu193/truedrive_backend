@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using truedrive_backend.Models;
 
 namespace truedrive_backend.Data
 {
@@ -12,6 +13,7 @@ namespace truedrive_backend.Data
         public DbSet<Models.Catalog> Catalog { get; set; }
         public DbSet<Models.Make> Make { get; set; }
         public DbSet<Models.User> Users { get; set; }
+        public DbSet<Models.Feedback> Feedback { get; set; }
     }
 }
 

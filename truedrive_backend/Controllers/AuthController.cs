@@ -52,10 +52,24 @@ namespace truedrive_backend.Controllers
                     userId = user.UserId,
                     fullName = user.FullName,
                     email = user.Email,
-                    role = user.Role
+                    address = user.Address,
+                    phone = user.PhoneNumber,
+                    role = user.Role,
                 }
             });
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // Perform any necessary cleanup or logging here
+            // For example, you can log the logout event
+            Console.WriteLine("User logged out");
+
+            // Optionally, you can return a message indicating the user has been logged out
+            return Ok(new { message = "Logout successful" });
+        }
+
 
         private string GenerateJwtToken(User user)
         {
