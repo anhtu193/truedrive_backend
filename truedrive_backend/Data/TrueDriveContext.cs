@@ -15,6 +15,7 @@ namespace truedrive_backend.Data
         public DbSet<Models.User> Users { get; set; }
         public DbSet<Models.Feedback> Feedback { get; set; }
         public DbSet<Models.Blog> Blog { get; set; }
+        public DbSet<Models.Policy> Policy { get; set; }
     }
 }
 
