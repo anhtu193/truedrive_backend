@@ -23,13 +23,38 @@ namespace truedrive_backend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(User user)
+        public async Task<IActionResult> Register(RegisterModel registerModel)
         {
-            // Hash the password before saving it to the database
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            var user = new User
+            {
+                FullName = registerModel.FullName,
+                Email = registerModel.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(registerModel.Password),
+                Address = registerModel.Address,
+                PhoneNumber = registerModel.PhoneNumber,
+                Role = "Customer" // Default role
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return Ok(new { message = "User registered successfully" });
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user);
+
+            return Ok(new
+            {
+                message = "User registered successfully",
+                token,
+                user = new
+                {
+                    userId = user.UserId,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    address = user.Address,
+                    phone = user.PhoneNumber,
+                    role = user.Role,
+                }
+            });
         }
 
         [HttpPost("login")]
@@ -92,6 +117,15 @@ namespace truedrive_backend.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+    }
+
+    public class RegisterModel
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Address { get; set; }
+        public string PhoneNumber { get; set; }
     }
 
     public class LoginModel
