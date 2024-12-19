@@ -85,13 +85,24 @@ namespace truedrive_backend.Controllers
         }
 
         [HttpPost("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout([FromHeader(Name = "Authorization")] string authorization)
         {
-            // Perform any necessary cleanup or logging here
-            // For example, you can log the logout event
-            Console.WriteLine("User logged out");
+            if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
+            {
+                return BadRequest(new { message = "Invalid token" });
+            }
 
-            // Optionally, you can return a message indicating the user has been logged out
+            var token = authorization.Substring("Bearer ".Length).Trim();
+
+            var tokenEntry = _context.Tokens.SingleOrDefault(t => t.JwtToken == token);
+            if (tokenEntry == null)
+            {
+                return NotFound(new { message = "Token not found" });
+            }
+
+            tokenEntry.IsValid = false;
+            await _context.SaveChangesAsync();
+
             return Ok(new { message = "Logout successful" });
         }
 
@@ -115,7 +126,20 @@ namespace truedrive_backend.Controllers
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+            // Save the token to the database
+            var tokenEntry = new Token
+            {
+                JwtToken = jwtToken,
+                IsValid = true,
+                CreatedAt = DateTime.Now,
+                UserId = user.UserId
+            };
+            _context.Tokens.Add(tokenEntry);
+            _context.SaveChanges();
+
+            return jwtToken;
         }
     }
 
@@ -133,4 +157,5 @@ namespace truedrive_backend.Controllers
         public string Email { get; set; }
         public string Password { get; set; }
     }
+
 }

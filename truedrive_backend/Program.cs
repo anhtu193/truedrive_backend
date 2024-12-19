@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using truedrive_backend.Data;
 using BCrypt.Net;
+using truedrive_backend.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,9 @@ using (var scope = app.Services.CreateScope())
 
 // Use CORS policy
 app.UseCors("AllowSpecificOrigin");
+
+// Register the TokenValidationMiddleware
+app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseHttpsRedirection();
 
