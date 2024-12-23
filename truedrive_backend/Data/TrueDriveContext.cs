@@ -19,6 +19,7 @@ namespace truedrive_backend.Data
         public DbSet<Models.Token> Tokens { get; set; }
         public DbSet<Models.Showroom> Showroom { get; set; }
         public DbSet<Models.Appointment> Appointment { get; set; }
+        public DbSet<Models.Wishlist> Wishlist { get; set; }
     }
 }
 
