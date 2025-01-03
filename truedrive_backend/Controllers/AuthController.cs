@@ -106,6 +106,19 @@ namespace truedrive_backend.Controllers
             return Ok(new { message = "Logout successful" });
         }
 
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<User>> GetUserById(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
 
         private string GenerateJwtToken(User user)
         {

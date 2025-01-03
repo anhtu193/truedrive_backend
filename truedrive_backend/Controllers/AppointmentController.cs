@@ -37,6 +37,22 @@ namespace truedrive_backend.Controllers
             return appointment;
         }
 
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<Appointment>>> GetAppointmentsByUserId(int userId)
+        {
+            var appointments = await _context.Appointment
+                .Where(a => a.CustomerId == userId)
+                .ToListAsync();
+
+            if (appointments == null || appointments.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(appointments);
+        }
+
         // POST: api/Appointment
         [HttpPost]
         public async Task<ActionResult<Appointment>> PostAppointment(Appointment appointment)
@@ -51,12 +67,47 @@ namespace truedrive_backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAppointment(int id, Appointment appointment)
         {
-            if (id != appointment.AppointmentId)
+            var existingAppointment = await _context.Appointment.FindAsync(id);
+            if (existingAppointment == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(appointment).State = EntityState.Modified;
+            // Update only the provided properties
+            if (appointment.CustomerId != 0)
+            {
+                existingAppointment.CustomerId = appointment.CustomerId;
+            }
+            if (appointment.CarId != 0)
+            {
+                existingAppointment.CarId = appointment.CarId;
+            }
+            if (!string.IsNullOrEmpty(appointment.Date))
+            {
+                existingAppointment.Date = appointment.Date;
+            }
+            if (!string.IsNullOrEmpty(appointment.Time))
+            {
+                existingAppointment.Time = appointment.Time;
+            }
+            if (!string.IsNullOrEmpty(appointment.Showroom))
+            {
+                existingAppointment.Showroom = appointment.Showroom;
+            }
+            if (!string.IsNullOrEmpty(appointment.Status))
+            {
+                existingAppointment.Status = appointment.Status;
+            }
+            if (!string.IsNullOrEmpty(appointment.Purpose))
+            {
+                existingAppointment.Purpose = appointment.Purpose;
+            }
+            if (!string.IsNullOrEmpty(appointment.Note))
+            {
+                existingAppointment.Note = appointment.Note;
+            }
+
+            _context.Entry(existingAppointment).State = EntityState.Modified;
 
             try
             {
@@ -76,6 +127,7 @@ namespace truedrive_backend.Controllers
 
             return NoContent();
         }
+
 
         // DELETE: api/Appointment/5
         [HttpDelete("{id}")]

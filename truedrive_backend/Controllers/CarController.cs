@@ -144,9 +144,60 @@ namespace truedrive_backend.Controllers
             return NoContent();
         }
 
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> ChangeCarStatus(int id, [FromBody] ChangeStatusRequest request)
+        {
+            var car = await _context.Car.FindAsync(id);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            car.Status = request.Status;
+            _context.Entry(car).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CarExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // GET: api/Car/status/{status}
+        [HttpGet("status/{status}")]
+        public async Task<ActionResult<IEnumerable<Car>>> GetCarsByStatus(string status)
+        {
+            var cars = await _context.Car.Where(c => c.Status == status).ToListAsync();
+
+            if (cars == null || cars.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(cars);
+        }
+
         private bool CarExists(int id)
         {
             return _context.Car.Any(e => e.CarId == id);
         }
+    }
+
+    public class ChangeStatusRequest
+    {
+        public string Status { get; set; }
     }
 }
